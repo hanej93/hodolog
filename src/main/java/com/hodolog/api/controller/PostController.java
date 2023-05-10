@@ -1,15 +1,13 @@
 package com.hodolog.api.controller;
 
+import com.hodolog.api.domain.Post;
 import com.hodolog.api.request.PostCreate;
 import com.hodolog.api.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -28,5 +26,11 @@ public class PostController {
         //              -> 서버에서 차라리 유연하게 대응하는게 좋음.
         //              -> 한 번에 일괄적으로 잘 처리되는 케이스는 없음 -> 잘 관리하는 형태가 중요
         postService.write(postCreate);
+    }
+
+    @GetMapping("/posts/{postId}")
+    public Post get(@PathVariable("postId") Long id) {
+        Post post = postService.get(id);
+        return post;
     }
 }
