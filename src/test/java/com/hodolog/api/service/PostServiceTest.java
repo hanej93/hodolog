@@ -2,6 +2,7 @@ package com.hodolog.api.service;
 
 import com.hodolog.api.domain.Post;
 import com.hodolog.api.request.PostCreate;
+import com.hodolog.api.response.PostResponse;
 import com.hodolog.api.respository.PostRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,20 +53,19 @@ class PostServiceTest {
     void test2() {
         // given
         Post requestPost = Post.builder()
-                .title("foo")
+                .title("1234567890123456")
                 .content("bar")
                 .build();
-
         postRepository.save(requestPost);
 
         // when
-        Post post = postService.get(requestPost.getId());
+        PostResponse response = postService.get(requestPost.getId());
 
         // then
-        assertThat(post).isNotNull();
+        assertThat(response).isNotNull();
         assertThat(postRepository.count()).isEqualTo(1L);
-        assertThat(post.getTitle()).isEqualTo("foo");
-        assertThat(post.getContent()).isEqualTo("bar");
+        assertThat(response.getTitle()).isEqualTo("1234567890");
+        assertThat(response.getContent()).isEqualTo("bar");
     }
 
 }
