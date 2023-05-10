@@ -1,6 +1,8 @@
-package com.hodolog.controller;
+package com.hodolog.api.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hodolog.api.domain.Post;
+import com.hodolog.api.request.PostCreate;
 import com.hodolog.api.respository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,10 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -24,7 +26,11 @@ class PostControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private PostRepository postRepository;
+
 
     @BeforeEach
     void clean() {
@@ -34,23 +40,36 @@ class PostControllerTest {
     @Test
     @DisplayName("/posts 요청시 빈 값")
     void test() throws Exception {
+        // given
+        PostCreate postCreate = PostCreate.builder()
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+        String request = objectMapper.writeValueAsString(postCreate);
+
         // expected
         mockMvc.perform(post("/posts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"글 제목입니다.\", \"content\":\"글 내용입니다 하하\"}")
+                        .contentType(APPLICATION_JSON)
+                        .content(request)
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().string("{}"))
+                .andExpect(content().string(""))
                 .andDo(print());
     }
 
     @Test
     @DisplayName("/posts 요청시 title값은 필수다.")
     void test2() throws Exception {
+        // given
+        PostCreate postCreate = PostCreate.builder()
+                .content("내용입니다.")
+                .build();
+        String request = objectMapper.writeValueAsString(postCreate);
+
         // expected
         mockMvc.perform(post("/posts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": null, \"content\":\"글 내용입니다 하하\"}")
+                        .contentType(APPLICATION_JSON)
+                        .content(request)
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
@@ -62,10 +81,17 @@ class PostControllerTest {
     @Test
     @DisplayName("/posts 요청시 DB에 값이 저장된다.")
     void test3() throws Exception {
+        // given
+        PostCreate postCreate = PostCreate.builder()
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+        String request = objectMapper.writeValueAsString(postCreate);
+
         // when
         mockMvc.perform(post("/posts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": \"제목입니다.\", \"content\":\"글 내용입니다.\"}")
+                        .contentType(APPLICATION_JSON)
+                        .content(request)
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -75,7 +101,7 @@ class PostControllerTest {
 
         Post post = postRepository.findAll().get(0);
         assertThat(post.getTitle()).isEqualTo("제목입니다.");
-        assertThat(post.getContent()).isEqualTo("글 내용입니다.");
+        assertThat(post.getContent()).isEqualTo("내용입니다.");
     }
 
 }
