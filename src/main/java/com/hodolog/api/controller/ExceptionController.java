@@ -1,6 +1,6 @@
-package com.hodolog.controller;
+package com.hodolog.api.controller;
 
-import com.hodolog.response.ErrorResponse;
+import com.hodolog.api.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;

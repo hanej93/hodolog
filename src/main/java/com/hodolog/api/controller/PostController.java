@@ -1,6 +1,8 @@
-package com.hodolog.controller;
+package com.hodolog.api.controller;
 
-import com.hodolog.request.PostCreate;
+import com.hodolog.api.request.PostCreate;
+import com.hodolog.api.service.PostService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,10 +13,14 @@ import java.util.Map;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 public class PostController {
 
+    private final PostService postService;
+
     @PostMapping("/posts")
-    public Map<String, String> post(@RequestBody @Valid PostCreate params) {
+    public Map<String, String> post(@RequestBody @Valid PostCreate postCreate) {
+        postService.write(postCreate);
         return Map.of();
     }
 }
