@@ -13,6 +13,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -129,31 +133,31 @@ class PostControllerTest {
     }
 
     @Test
-    @DisplayName("글 여러개 조회")
+    @DisplayName("글 1페이지 조회")
     void test5() throws Exception {
         // given
-        Post post1 = postRepository.save(Post.builder()
-                .title("title_1")
-                .content("content_1")
-                .build());
-
-        Post post2 = postRepository.save(Post.builder()
-                .title("title_2")
-                .content("content_2")
-                .build());
+        List<Post> requestposts = IntStream.range(1, 31)
+                .mapToObj(i ->
+                        Post.builder()
+                                .title("호돌맨 제목 " + i)
+                                .content("반포자이 " + i)
+                                .build()
+                )
+                .collect(Collectors.toList());
+        postRepository.saveAll(requestposts);
 
         // expected
-        mockMvc.perform(get("/posts")
+        mockMvc.perform(get("/posts?page=1&sort=id,desc&size=5")
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("size()", is(2)))
-                .andExpect(jsonPath("$[0].id").value(post1.getId()))
-                .andExpect(jsonPath("$[0].title").value("title_1"))
-                .andExpect(jsonPath("$[0].content").value("content_1"))
-                .andExpect(jsonPath("$[1].id").value(post2.getId()))
-                .andExpect(jsonPath("$[1].title").value("title_2"))
-                .andExpect(jsonPath("$[1].content").value("content_2"))
+                .andExpect(jsonPath("size()", is(5)))
+                .andExpect(jsonPath("$[0].id").value("30"))
+                .andExpect(jsonPath("$[0].title").value("호돌맨 제목 30"))
+                .andExpect(jsonPath("$[0].content").value("반포자이 30"))
+                .andExpect(jsonPath("$[4].id").value("26"))
+                .andExpect(jsonPath("$[4].title").value("호돌맨 제목 26"))
+                .andExpect(jsonPath("$[4].content").value("반포자이 26"))
                 .andDo(print());
     }
 }
