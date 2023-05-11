@@ -1,27 +1,23 @@
 package com.hodolog.api.service;
 
 import com.hodolog.api.domain.Post;
+import com.hodolog.api.exception.PostNotFound;
 import com.hodolog.api.request.PostCreate;
 import com.hodolog.api.request.PostEdit;
 import com.hodolog.api.request.PostSearch;
 import com.hodolog.api.response.PostResponse;
 import com.hodolog.api.respository.PostRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 class PostServiceTest {
@@ -170,6 +166,63 @@ class PostServiceTest {
 
         // then
         assertThat(postRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("글 1개 조회 - 조회하지 않는 글")
+    void test7() {
+        // given
+        Post post = Post.builder()
+                .title("호돌맨")
+                .content("반포자이")
+                .build();
+        postRepository.save(post);
+
+        // expected
+//        assertThatIllegalArgumentException()
+//                .isThrownBy(() -> postService.get(post.getId() + 1))
+//                .withMessage("존재하지 않는 글입니다.");
+
+        assertThatThrownBy(() -> postService.get(post.getId() + 1))
+                .isInstanceOf(PostNotFound.class)
+                .hasMessage("존재하지 않는 글입니다.");
+    }
+
+    @Test
+    @DisplayName("게시글 삭제- 존재하지 않는 글")
+    void test8() {
+        // given
+        Post post = Post.builder()
+                .title("호돌맨")
+                .content("반포자이")
+                .build();
+        postRepository.save(post);
+
+        // expect
+        assertThatThrownBy(() -> postService.delete(post.getId() + 1))
+                .isInstanceOf(PostNotFound.class)
+                .hasMessage("존재하지 않는 글입니다.");
+    }
+
+    @Test
+    @DisplayName("글 내용 수정 - 존재하지 않는 글")
+    void test9() {
+        // given
+        Post post = Post.builder()
+                .title("호돌맨")
+                .content("반포자이")
+                .build();
+        postRepository.save(post);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title("호돌맨")
+                .content("초가집")
+                .build();
+
+        // expect
+        assertThatThrownBy(() -> postService.edit(post.getId() + 1, postEdit))
+                .isInstanceOf(PostNotFound.class)
+                .hasMessage("존재하지 않는 글입니다.");
     }
 
     @Test
