@@ -2,6 +2,7 @@ package com.hodolog.api.service;
 
 import com.hodolog.api.domain.Post;
 import com.hodolog.api.request.PostCreate;
+import com.hodolog.api.request.PostEdit;
 import com.hodolog.api.request.PostSearch;
 import com.hodolog.api.response.PostResponse;
 import com.hodolog.api.respository.PostRepository;
@@ -104,4 +105,53 @@ class PostServiceTest {
         assertThat(posts.get(9).getTitle()).isEqualTo("호돌맨 제목 11");
     }
 
+    @Test
+    @DisplayName("글 제목 수정")
+    void test4() {
+        // given
+        Post post = Post.builder()
+                .title("호돌맨")
+                .content("반포자이")
+                .build();
+        postRepository.save(post);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title("호돌걸")
+                .content("반포자이")
+                .build();
+
+        // when
+        postService.edit(post.getId(), postEdit);
+
+        // then
+        Post changedPost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. io=" + post.getId()));
+        assertThat(changedPost.getTitle()).isEqualTo("호돌걸");
+        assertThat(changedPost.getContent()).isEqualTo("반포자이");
+    }
+
+    @Test
+    @DisplayName("글 내용 수정")
+    void test5() {
+        // given
+        Post post = Post.builder()
+                .title("호돌맨")
+                .content("반포자이")
+                .build();
+        postRepository.save(post);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title("호돌맨")
+                .content("초가집")
+                .build();
+
+        // when
+        postService.edit(post.getId(), postEdit);
+
+        // then
+        Post changedPost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. io=" + post.getId()));
+        assertThat(changedPost.getTitle()).isEqualTo("호돌맨");
+        assertThat(changedPost.getContent()).isEqualTo("초가집");
+    }
 }
