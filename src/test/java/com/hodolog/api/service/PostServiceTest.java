@@ -2,6 +2,7 @@ package com.hodolog.api.service;
 
 import com.hodolog.api.domain.Post;
 import com.hodolog.api.request.PostCreate;
+import com.hodolog.api.request.PostSearch;
 import com.hodolog.api.response.PostResponse;
 import com.hodolog.api.respository.PostRepository;
 import org.assertj.core.api.Assertions;
@@ -90,15 +91,17 @@ class PostServiceTest {
                 .collect(Collectors.toList());
         postRepository.saveAll(requestPosts);
 
-        Pageable pageable = PageRequest.of(0, 5, Sort.by(DESC, "id"));
+        PostSearch postSearch = PostSearch.builder()
+                .page(2)
+                .build();
 
         // when
-        List<PostResponse> posts = postService.getList(pageable);
+        List<PostResponse> posts = postService.getList(postSearch);
 
         // then
-        assertThat(posts.size()).isEqualTo(5L);
-        assertThat(posts.get(0).getTitle()).isEqualTo("호돌맨 제목 30");
-        assertThat(posts.get(4).getTitle()).isEqualTo("호돌맨 제목 26");
+        assertThat(posts.size()).isEqualTo(10L);
+        assertThat(posts.get(0).getTitle()).isEqualTo("호돌맨 제목 20");
+        assertThat(posts.get(9).getTitle()).isEqualTo("호돌맨 제목 11");
     }
 
 }

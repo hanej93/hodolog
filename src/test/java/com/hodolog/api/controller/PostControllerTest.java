@@ -3,6 +3,7 @@ package com.hodolog.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hodolog.api.domain.Post;
 import com.hodolog.api.request.PostCreate;
+import com.hodolog.api.request.PostSearch;
 import com.hodolog.api.respository.PostRepository;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -147,15 +148,42 @@ class PostControllerTest {
         postRepository.saveAll(requestposts);
 
         // expected
-        mockMvc.perform(get("/posts?page=1&sort=id,desc&size=5")
+        mockMvc.perform(get("/posts")
+                        .param("page", "2")
+                        .param("size", "10")
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("size()", is(5)))
-                .andExpect(jsonPath("$[0].id").value("30"))
+                .andExpect(jsonPath("size()", is(10)))
+                .andExpect(jsonPath("$[0].title").value("호돌맨 제목 20"))
+                .andExpect(jsonPath("$[0].content").value("반포자이 20"))
+                .andExpect(jsonPath("$[4].title").value("호돌맨 제목 16"))
+                .andExpect(jsonPath("$[4].content").value("반포자이 16"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("페이지를 0으로 요청하면 첫 페이지를 가져온다.")
+    void test6() throws Exception {
+        // given
+        List<Post> requestposts = IntStream.range(1, 31)
+                .mapToObj(i ->
+                        Post.builder()
+                                .title("호돌맨 제목 " + i)
+                                .content("반포자이 " + i)
+                                .build()
+                )
+                .collect(Collectors.toList());
+        postRepository.saveAll(requestposts);
+
+        // expected
+        mockMvc.perform(get("/posts")
+                        .contentType(APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("size()", is(10)))
                 .andExpect(jsonPath("$[0].title").value("호돌맨 제목 30"))
                 .andExpect(jsonPath("$[0].content").value("반포자이 30"))
-                .andExpect(jsonPath("$[4].id").value("26"))
                 .andExpect(jsonPath("$[4].title").value("호돌맨 제목 26"))
                 .andExpect(jsonPath("$[4].content").value("반포자이 26"))
                 .andDo(print());
