@@ -154,4 +154,29 @@ class PostServiceTest {
         assertThat(changedPost.getTitle()).isEqualTo("호돌맨");
         assertThat(changedPost.getContent()).isEqualTo("초가집");
     }
+
+    @Test
+    @DisplayName("글 내용 수정")
+    void test10() {
+        // given
+        Post post = Post.builder()
+                .title("호돌맨")
+                .content("반포자이")
+                .build();
+        postRepository.save(post);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title(null)
+                .content("초가집")
+                .build();
+
+        // when
+        postService.edit(post.getId(), postEdit);
+
+        // then
+        Post changedPost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. io=" + post.getId()));
+        assertThat(changedPost.getTitle()).isEqualTo("호돌맨");
+        assertThat(changedPost.getContent()).isEqualTo("초가집");
+    }
 }
