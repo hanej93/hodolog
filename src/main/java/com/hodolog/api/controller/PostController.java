@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hodolog.api.config.data.UserSession;
 import com.hodolog.api.request.PostCreate;
 import com.hodolog.api.request.PostEdit;
 import com.hodolog.api.request.PostSearch;
@@ -29,14 +30,15 @@ public class PostController {
 
     private final PostService postService;
 
-	@GetMapping("/test")
-	public String test() {
-		return "hello";
+	@GetMapping("/foo")
+	public String foo(UserSession userSession) {
+		log.info(">>> {}", userSession.getName());
+		return userSession.getName();
 	}
 
-	@GetMapping("/foo")
-	public String foo() {
-		return "foo";
+	@GetMapping("/bar")
+	public String bar(UserSession userSession) {
+		return "인증이 필요없는 페이지";
 	}
 
     @PostMapping("/posts")
