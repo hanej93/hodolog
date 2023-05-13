@@ -7,6 +7,9 @@ import lombok.Setter;
 @Setter
 public class UserSession {
 
-	private String name;
+	private Long id;
 
+	public UserSession(Long id) {
+		this.id = id;
+	}
 }
