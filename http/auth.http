@@ -7,3 +7,8 @@ Content-Type: application/json
   "email": "hodolman@gamil.com",
   "password": "1234"
 }
+
+### 인증 페이지 요청
+GET http://localhost:8080/foo
+Content-Type: application/json
+Cookie: SESSION=36571a7c-fbad-459b-8212-88e004b81023
