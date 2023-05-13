@@ -179,7 +179,7 @@ class PostControllerTest {
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("size()", is(10)))
+                .andExpect(jsonPath("size()").value(10L))
                 .andExpect(jsonPath("$[0].title").value("호돌맨 제목 30"))
                 .andExpect(jsonPath("$[0].content").value("반포자이 30"))
                 .andExpect(jsonPath("$[4].title").value("호돌맨 제목 26"))
