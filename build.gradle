@@ -66,6 +66,7 @@ asciidoctor.doFirst {
 }
 
 bootJar {
+    enabled = true
 	dependsOn asciidoctor
 	copy {
 		from asciidoctor.outputDir
