@@ -1,21 +1,15 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+<script lang="ts" setup>
+import Header from "@/components/Header.vue";
+import Content from "@/components/Content.vue";
 </script>
 
 <template>
-  <header>
-
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/write">글작성</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+    <Header/>
+    <Content/>
 </template>
 
 <style>
-
+body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
 </style>
