@@ -1,13 +1,11 @@
 package com.hodolog.api.service;
 
-import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hodolog.api.domain.Session;
+import com.hodolog.api.crypto.PasswordEncoder;
 import com.hodolog.api.domain.User;
 import com.hodolog.api.exception.AlreadyExistsEmailException;
-import com.hodolog.api.exception.InvalidRequest;
 import com.hodolog.api.exception.InvalidSignInInformation;
 import com.hodolog.api.request.Login;
 import com.hodolog.api.request.Signup;
@@ -21,12 +19,17 @@ import lombok.RequiredArgsConstructor;
 public class AuthService {
 
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
 	public Long signIn(Login login) {
-		User user = userRepository.findByEmailAndPassword(login.getEmail(), login.getPassword())
+		User user = userRepository.findByEmail(login.getEmail())
 			.orElseThrow(InvalidSignInInformation::new);
-		Session session = user.addSession();
+
+		boolean matches = passwordEncoder.matches(login.getPassword(), user.getPassword());
+		if (!matches) {
+			throw new InvalidSignInInformation();
+		}
 
 		return user.getId();
 	}
@@ -38,8 +41,7 @@ public class AuthService {
 				throw new AlreadyExistsEmailException();
 			});
 
-		SCryptPasswordEncoder sCryptPasswordEncoder = new SCryptPasswordEncoder(16, 8, 1, 32, 64);
-		String encryptedPassword = sCryptPasswordEncoder.encode(signup.getPassword());
+		String encryptedPassword = passwordEncoder.encrypt(signup.getPassword());
 
 		User user = User.builder()
 			.email(signup.getEmail())
