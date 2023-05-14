@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hodolog.api.config.AppConfig;
 import com.hodolog.api.domain.Session;
 import com.hodolog.api.domain.User;
 import com.hodolog.api.request.Login;
@@ -34,6 +35,9 @@ class AuthControllerTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private AppConfig appConfig;
 
 	@Autowired
 	private UserRepository userRepository;

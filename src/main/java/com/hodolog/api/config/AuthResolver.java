@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthResolver implements HandlerMethodArgumentResolver {
 
 	private final SessionRepository sessionRepository;
-	private static final String KEY = "IT+oSV+G8YN8F9yqB3K5T3aIRnxZdYj2AS+p8e9DfpQ=";
+	private final AppConfig appConfig;
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -41,11 +41,9 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
 			throw new Unauthorized();
 		}
 
-		byte[] decodedKey = Base64.decodeBase64(KEY);
-
 		try {
 			Jws<Claims> claimsJws = Jwts.parserBuilder()
-				.setSigningKey(decodedKey)
+				.setSigningKey(appConfig.getJwtKey())
 				.build()
 				.parseClaimsJws(jws);
 
