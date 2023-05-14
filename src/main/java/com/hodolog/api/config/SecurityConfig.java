@@ -43,6 +43,7 @@ public class SecurityConfig {
 				.usernameParameter("username")
 				.passwordParameter("password")
 				.defaultSuccessUrl("/")
+				.permitAll()
 			.and()
 			.rememberMe()
 				.rememberMeParameter("remember")
