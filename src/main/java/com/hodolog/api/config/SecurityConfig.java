@@ -4,21 +4,22 @@ import static org.springframework.boot.autoconfigure.security.servlet.PathReques
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.hodolog.api.domain.User;
+import com.hodolog.api.respository.UserRepository;
+
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 public class SecurityConfig {
 
 	@Bean
@@ -32,7 +33,8 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 			.authorizeRequests()
-				.requestMatchers("/auth/login").permitAll()
+				.requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+				.requestMatchers(HttpMethod.POST, "/auth/signup").permitAll()
 				.anyRequest().authenticated()
 			.and()
 			.formLogin()
@@ -47,25 +49,22 @@ public class SecurityConfig {
 				.alwaysRemember(false)
 				.tokenValiditySeconds(3600 * 24 * 30)
 			.and()
-			.userDetailsService(userDetailsService())
 			.csrf(AbstractHttpConfigurer::disable)
 			.build();
 	}
 
 	@Bean
-	public UserDetailsService userDetailsService() {
-		UserDetails user =
-			User.withUsername("hodolman")
-				.password("1234")
-				.roles("ADMIN")
-				.build();
-
-		return new InMemoryUserDetailsManager(user);
+	public UserDetailsService userDetailsService(UserRepository userRepository) {
+		return username -> {
+			User user = userRepository.findByEmail(username)
+				.orElseThrow(() -> new UsernameNotFoundException(username + "을 찾을 수 없습니다."));
+			return new UserPrincipal(user);
+		};
 	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return NoOpPasswordEncoder.getInstance();
+		return new SCryptPasswordEncoder(16, 8, 1, 32, 64);
 	}
 
 }
