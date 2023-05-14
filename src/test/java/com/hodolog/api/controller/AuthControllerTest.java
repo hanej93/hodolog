@@ -7,6 +7,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.security.Key;
+import java.util.Date;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +31,10 @@ import com.hodolog.api.request.Signup;
 import com.hodolog.api.respository.SessionRepository;
 import com.hodolog.api.respository.UserRepository;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest
 class AuthControllerTest {
@@ -80,7 +88,7 @@ class AuthControllerTest {
 
 	@Test
 	@Transactional
-	@DisplayName("로그인 성공 후 세션 1개 생성")
+	@DisplayName("로그인 성공")
 	void test2() throws Exception {
 		// given
 		User user = User.builder()
@@ -104,13 +112,11 @@ class AuthControllerTest {
 			)
 			.andExpect(status().isOk())
 			.andDo(print());
-
-		assertThat(user.getSessions().size()).isEqualTo(1L);
 	}
 
 	@Test
 	@Transactional
-	@DisplayName("로그인 성공 후 세션 응답")
+	@DisplayName("로그인 성공 후 토큰 응답")
 	void test3() throws Exception {
 		// given
 		User user = User.builder()
@@ -146,12 +152,18 @@ class AuthControllerTest {
 			.email("hodolman@gmail.com")
 			.password("1234")
 			.build();
-		Session session = user.addSession();
 		userRepository.save(user);
+
+		Key key = Keys.hmacShaKeyFor(appConfig.getJwtKey());
+		String jws = Jwts.builder()
+			.setSubject(String.valueOf(user.getId()))
+			.signWith(key)
+			.setIssuedAt(new Date())
+			.compact();
 
 		// expected
 		mockMvc.perform(get("/foo")
-				.header("authorization", session.getAccessToken())
+				.header("authorization", jws)
 				.contentType(APPLICATION_JSON)
 			)
 			.andExpect(status().isOk())
