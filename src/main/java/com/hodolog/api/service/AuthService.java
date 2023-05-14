@@ -8,7 +8,6 @@ import com.hodolog.api.crypto.ScryptPasswordEncoder;
 import com.hodolog.api.domain.User;
 import com.hodolog.api.exception.AlreadyExistsEmailException;
 import com.hodolog.api.exception.InvalidSignInInformation;
-import com.hodolog.api.request.Login;
 import com.hodolog.api.request.Signup;
 import com.hodolog.api.respository.UserRepository;
 
@@ -21,19 +20,6 @@ public class AuthService {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
-
-	@Transactional
-	public Long signIn(Login login) {
-		User user = userRepository.findByEmail(login.getEmail())
-			.orElseThrow(InvalidSignInInformation::new);
-
-		boolean matches = passwordEncoder.matches(login.getPassword(), user.getPassword());
-		if (!matches) {
-			throw new InvalidSignInInformation();
-		}
-
-		return user.getId();
-	}
 
 	@Transactional
 	public void signup(Signup signup) {

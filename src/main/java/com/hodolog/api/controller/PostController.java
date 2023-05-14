@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hodolog.api.config.data.UserSession;
 import com.hodolog.api.request.PostCreate;
 import com.hodolog.api.request.PostEdit;
 import com.hodolog.api.request.PostSearch;
@@ -29,17 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
 
     private final PostService postService;
-
-	@GetMapping("/foo")
-	public Long foo(UserSession userSession) {
-		log.info(">>> {}", userSession.getId());
-		return userSession.getId();
-	}
-
-	@GetMapping("/bar")
-	public String bar(UserSession userSession) {
-		return "인증이 필요없는 페이지";
-	}
 
     @PostMapping("/posts")
     public void post(@RequestBody @Valid PostCreate postCreate) {

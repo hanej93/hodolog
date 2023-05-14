@@ -10,11 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.hodolog.api.crypto.PasswordEncoder;
-import com.hodolog.api.crypto.ScryptPasswordEncoder;
 import com.hodolog.api.domain.User;
 import com.hodolog.api.exception.AlreadyExistsEmailException;
-import com.hodolog.api.exception.InvalidSignInInformation;
-import com.hodolog.api.request.Login;
 import com.hodolog.api.request.Signup;
 import com.hodolog.api.respository.UserRepository;
 
@@ -78,52 +75,6 @@ class AuthServiceTest {
 		// expected
 		assertThatThrownBy(() -> authService.signup(signup))
 			.isInstanceOf(AlreadyExistsEmailException.class);
-	}
-
-	@Test
-	@DisplayName("로그인 성공")
-	void test3() throws Exception {
-		// given
-		String encryptedPassword = passwordEncoder.encrypt("1234");
-
-		User user = User.builder()
-			.email("hodolman@gamil.com")
-			.password(encryptedPassword)
-			.name("호돌맨")
-			.build();
-		userRepository.save(user);
-
-		Login login = Login.builder()
-			.email("hodolman@gamil.com")
-			.password("1234")
-			.build();
-
-		// when
-		Long userId = authService.signIn(login);
-
-		// then
-		assertThat(userId).isNotNull();
-	}
-
-	@Test
-	@DisplayName("로그인 시 비밀번호 틀림")
-	void test4() throws Exception {
-		// given
-		Signup signup = Signup.builder()
-			.email("hodolman@gamil.com")
-			.password("1234")
-			.name("호돌맨")
-			.build();
-		authService.signup(signup);
-
-		Login login = Login.builder()
-			.email("hodolman@gamil.com")
-			.password("12345")
-			.build();
-
-		// expected
-		assertThatThrownBy(() -> authService.signIn(login))
-			.isInstanceOf(InvalidSignInInformation.class);
 	}
 
 }

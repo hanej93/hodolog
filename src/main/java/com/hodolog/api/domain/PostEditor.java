@@ -1,6 +1,5 @@
 package com.hodolog.api.domain;
 
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
