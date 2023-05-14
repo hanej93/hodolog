@@ -38,7 +38,7 @@ public class SecurityConfig {
 			.formLogin()
 				.loginPage("/auth/login")
 				.loginProcessingUrl("/auth/login")
-				.usernameParameter("uesrname")
+				.usernameParameter("username")
 				.passwordParameter("password")
 				.defaultSuccessUrl("/")
 			.and()
@@ -50,8 +50,7 @@ public class SecurityConfig {
 	@Bean
 	public UserDetailsService userDetailsService() {
 		UserDetails user =
-			User.withDefaultPasswordEncoder()
-				.username("hodolman")
+			User.withUsername("hodolman")
 				.password("1234")
 				.roles("ADMIN")
 				.build();
