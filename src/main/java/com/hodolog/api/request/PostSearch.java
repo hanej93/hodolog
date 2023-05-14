@@ -1,9 +1,12 @@
 package com.hodolog.api.request;
 
-import lombok.*;
+import static java.lang.Math.*;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

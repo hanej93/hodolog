@@ -1,9 +1,10 @@
 package com.hodolog.api.request;
 
 import com.hodolog.api.exception.InvalidRequest;
+
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor

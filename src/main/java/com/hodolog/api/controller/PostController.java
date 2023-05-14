@@ -2,7 +2,6 @@ package com.hodolog.api.controller;
 
 import java.util.List;
 
-import javax.validation.Valid;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +18,7 @@ import com.hodolog.api.request.PostSearch;
 import com.hodolog.api.response.PostResponse;
 import com.hodolog.api.service.PostService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
