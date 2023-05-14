@@ -1,8 +1,6 @@
 package com.hodolog.api.config;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -11,10 +9,13 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.hodolog.api.config.data.UserSession;
-import com.hodolog.api.domain.Session;
 import com.hodolog.api.exception.Unauthorized;
 import com.hodolog.api.respository.SessionRepository;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthResolver implements HandlerMethodArgumentResolver {
 
 	private final SessionRepository sessionRepository;
+	private static final String KEY = "IT+oSV+G8YN8F9yqB3K5T3aIRnxZdYj2AS+p8e9DfpQ=";
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -33,34 +35,26 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 		NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-		HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
-		if (servletRequest == null) {
-			log.error("servletRequest Null");
+		String jws = webRequest.getHeader("Authorization");
+
+		if (ObjectUtils.isEmpty(jws)) {
 			throw new Unauthorized();
 		}
 
-		Cookie[] cookies = servletRequest.getCookies();
-		if(cookies.length == 0) {
-			log.error("쿠키가 없음");
+		byte[] decodedKey = Base64.decodeBase64(KEY);
+
+		try {
+			Jws<Claims> claimsJws = Jwts.parserBuilder()
+				.setSigningKey(decodedKey)
+				.build()
+				.parseClaimsJws(jws);
+
+			String userId = claimsJws.getBody()
+				.getSubject();
+
+			return new UserSession(Long.parseLong(userId));
+		} catch (JwtException e) {
 			throw new Unauthorized();
 		}
-
-		String accessToken = null;
-
-		for (Cookie cookie : cookies) {
-			if ("SESSION".equals(cookie.getName())) {
-				accessToken = cookie.getValue();
-				break;
-			}
-		}
-
-		if (ObjectUtils.isEmpty(accessToken)) {
-			throw new Unauthorized();
-		}
-
-		Session session = sessionRepository.findByAccessToken(accessToken)
-			.orElseThrow(Unauthorized::new);
-
-		return new UserSession(session.getUser().getId());
 	}
 }
