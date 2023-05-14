@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hodolog.api.crypto.PasswordEncoder;
+import com.hodolog.api.crypto.ScryptPasswordEncoder;
 import com.hodolog.api.domain.User;
 import com.hodolog.api.exception.AlreadyExistsEmailException;
 import com.hodolog.api.exception.InvalidSignInInformation;

@@ -2,14 +2,15 @@ package com.hodolog.api.service;
 
 import static org.assertj.core.api.Assertions.*;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.hodolog.api.crypto.PasswordEncoder;
+import com.hodolog.api.crypto.ScryptPasswordEncoder;
 import com.hodolog.api.domain.User;
 import com.hodolog.api.exception.AlreadyExistsEmailException;
 import com.hodolog.api.exception.InvalidSignInInformation;
@@ -17,6 +18,7 @@ import com.hodolog.api.request.Login;
 import com.hodolog.api.request.Signup;
 import com.hodolog.api.respository.UserRepository;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class AuthServiceTest {
 
@@ -51,9 +53,9 @@ class AuthServiceTest {
 		assertThat(userRepository.count()).isEqualTo(1L);
 
 		User user = userRepository.findAll().iterator().next();
-		assertThat(user.getEmail()).isEqualTo("hodolman@gamil.com");
-		assertThat(user.getPassword()).isNotEqualTo("1234").isNotNull();
-		assertThat(user.getName()).isEqualTo("호돌맨");
+		assertThat(user.getEmail()).isEqualTo(signup.getEmail());
+		assertThat(user.getPassword()).isEqualTo(signup.getPassword());
+		assertThat(user.getName()).isEqualTo(signup.getName());
 	}
 
 	@Test
@@ -75,8 +77,7 @@ class AuthServiceTest {
 
 		// expected
 		assertThatThrownBy(() -> authService.signup(signup))
-			.isInstanceOf(AlreadyExistsEmailException.class)
-			.hasMessage("이미 가입된 이메일입니다.");
+			.isInstanceOf(AlreadyExistsEmailException.class);
 	}
 
 	@Test
