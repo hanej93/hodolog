@@ -17,12 +17,5 @@ spring:
         one-indexed-parameters: true
         default-page-size: 5
 
-  jpa:
-    defer-datasource-initialization: true
-
-  sql:
-    init:
-      mode: always
-
 hodolman:
   jwt-key: IT+oSV+G8YN8F9yqB3K5T3aIRnxZdYj2AS+p8e9DfpQ=

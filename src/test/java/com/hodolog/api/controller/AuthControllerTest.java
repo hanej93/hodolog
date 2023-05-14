@@ -23,6 +23,7 @@ import com.hodolog.api.domain.Session;
 import com.hodolog.api.domain.User;
 import com.hodolog.api.request.Login;
 import com.hodolog.api.request.PostCreate;
+import com.hodolog.api.request.Signup;
 import com.hodolog.api.respository.SessionRepository;
 import com.hodolog.api.respository.UserRepository;
 
@@ -175,6 +176,26 @@ class AuthControllerTest {
 				.contentType(APPLICATION_JSON)
 			)
 			.andExpect(status().isUnauthorized())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("회원 가입")
+	void test6() throws Exception {
+		// given
+		Signup signup = Signup.builder()
+			.email("hodolman@gamil.com")
+			.password("1234")
+			.name("호돌맨")
+			.build();
+
+
+		// expected
+		mockMvc.perform(post("/auth/signup")
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(signup))
+			)
+			.andExpect(status().isOk())
 			.andDo(print());
 	}
 

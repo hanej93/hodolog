@@ -1,7 +1,6 @@
 package com.hodolog.api.config;
 
 import java.util.Base64;
-import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

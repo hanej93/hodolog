@@ -8,5 +8,6 @@ import com.hodolog.api.domain.User;
 
 public interface UserRepository extends CrudRepository<User, Long> {
 
+	Optional<User> findByEmail(String email);
 	Optional<User> findByEmailAndPassword(String email, String password);
 }
