@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 
 import com.hodolog.api.domain.User;
 import com.hodolog.api.respository.UserRepository;
@@ -33,8 +34,9 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 			.authorizeRequests()
-				.requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-				.requestMatchers(HttpMethod.POST, "/auth/signup").permitAll()
+				.requestMatchers("/auth/login").permitAll()
+				.requestMatchers("/auth/signup").permitAll()
+				.requestMatchers("/admin").access("hasRole('ADMIN') AND hasAuthority('WRITE')")
 				.anyRequest().authenticated()
 			.and()
 			.formLogin()
